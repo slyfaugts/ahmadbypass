@@ -10,6 +10,6 @@
     "FIREBASE_DB_URL": "https://ahmadbypassv1-default-rtdb.firebaseio.com",
     "FIREBASE_SECRET": "EIoarFDROPSa8hp1muLIQpxXlDiMiY5iwkgARbX6",
     "ADMIN_DISCORD_IDS": "1336957387155968164",
-    "ALLOWED_ORIGIN": "https://ahmadbypass.vercel.app/"
+    "ALLOWED_ORIGIN": "https://ahmadbypass.vercel.app"
   }
 }
