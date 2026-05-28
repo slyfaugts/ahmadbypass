@@ -9,7 +9,7 @@
     "DISCORD_REDIRECT_URI": "https://ahmadbypass.vercel.app/api/auth?action=discord",
     "FIREBASE_DB_URL": "https://ahmadbypassv1-default-rtdb.firebaseio.com/",
     "FIREBASE_SECRET": "EIoarFDROPSa8hp1muLIQpxXlDiMiY5iwkgARbX6",
-    "ADMIN_DISCORD_IDS": "@slyfaugts",
+    "ADMIN_DISCORD_IDS": "1336957387155968164",
     "ALLOWED_ORIGIN": "@allowed_origin"
   }
 }
