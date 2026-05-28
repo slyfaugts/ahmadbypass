@@ -4,9 +4,9 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "env": {
-    "DISCORD_CLIENT_ID": "@discord_client_id",
-    "DISCORD_CLIENT_SECRET": "@discord_client_secret",
-    "DISCORD_REDIRECT_URI": "@discord_redirect_uri",
+    "DISCORD_CLIENT_ID": "@1509482301183234129",
+    "DISCORD_CLIENT_SECRET": "@G77g1Rb6pzt1BJolswq5yriXkYdtkVlg",
+    "DISCORD_REDIRECT_URI": "@https://ahmadbypass.vercel.app/api/auth?action=discord",
     "FIREBASE_DB_URL": "@firebase_db_url",
     "FIREBASE_SECRET": "@firebase_secret",
     "ADMIN_DISCORD_IDS": "@slyfaugts",
