@@ -9,7 +9,7 @@
     "DISCORD_REDIRECT_URI": "@discord_redirect_uri",
     "FIREBASE_DB_URL": "@firebase_db_url",
     "FIREBASE_SECRET": "@firebase_secret",
-    "ADMIN_DISCORD_IDS": "@admin_discord_ids",
+    "ADMIN_DISCORD_IDS": "@slyfaugts",
     "ALLOWED_ORIGIN": "@allowed_origin"
   }
 }
