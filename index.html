@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AhmadBypass v2 — Roblox Music Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #1a1a24;
+  --surface3: #22222e;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f0f5;
+  --text2: #9090a8;
+  --text3: #5a5a70;
+  --accent: #7c6df0;
+  --accent2: #5b4fd4;
+  --accent-glow: rgba(124,109,240,0.15);
+  --green: #22c55e;
+  --green-bg: rgba(34,197,94,0.08);
+  --red: #ef4444;
+  --red-bg: rgba(239,68,68,0.08);
+  --yellow: #eab308;
+  --yellow-bg: rgba(234,179,8,0.08);
+  --cyan: #06b6d4;
+  --cyan-bg: rgba(6,182,212,0.08);
+  --mono: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+::selection{background:var(--accent);color:#fff;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px;}
+
+/* ── LAYOUT ── */
+.app-shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh;}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.main{padding:32px;max-width:900px;}
+@media(max-width:768px){.app-shell{grid-template-columns:1fr;}.sidebar{display:none;}.main{padding:16px;}}
+
+/* ── SIDEBAR ── */
+.brand{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:20px;}
+.brand-icon{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.brand-name{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;}
+.brand-name span{color:var(--accent);}
+.brand-ver{font-size:10px;color:var(--text3);letter-spacing:1px;}
+.nav-section{font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;padding:8px 12px 4px;margin-top:8px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text2);transition:all 0.15s;border:none;background:transparent;width:100%;text-align:left;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:var(--accent-glow);color:var(--accent);font-weight:500;}
+.nav-item i{font-size:15px;width:18px;text-align:center;}
+.sidebar-footer{margin-top:auto;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);}
+.user-chip{display:flex;align-items:center;gap:10px;}
+.user-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--border2);}
+.user-avatar-placeholder{width:32px;height:32px;border-radius:50%;background:var(--surface3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;}
+.user-name{font-size:13px;font-weight:500;color:var(--text);}
+.user-tier{font-size:10px;color:var(--text3);}
+
+/* ── MODALS / OVERLAYS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);max-width:480px;width:100%;overflow:hidden;}
+.modal-header{padding:24px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-title{font-size:18px;font-weight:700;letter-spacing:-0.3px;}
+.modal-close{background:transparent;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;font-size:18px;line-height:1;transition:all 0.15s;}
+.modal-close:hover{color:var(--text);background:var(--surface2);}
+.modal-body{padding:20px 24px 24px;}
+
+/* ── LOGIN WALL ── */
+#loginWall{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px;}
+.login-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);max-width:420px;width:100%;padding:40px 36px;text-align:center;position:relative;}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),#a78bfa,var(--cyan));border-radius:var(--radius-lg) var(--radius-lg) 0 0;z-index:0;}
+.login-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,var(--accent-glow),transparent 70%);pointer-events:none;z-index:0;}
+.login-logo{font-family:var(--mono);font-size:24px;font-weight:700;margin-bottom:4px;position:relative;z-index:1;}
+.login-logo span{color:var(--accent);}
+.login-ver{font-size:11px;color:var(--text3);letter-spacing:2px;margin-bottom:28px;position:relative;z-index:1;}
+.login-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;text-align:left;position:relative;z-index:1;}
+.login-step{display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--text2);}
+.step-dot{width:20px;height:20px;border-radius:50%;background:var(--accent-glow);border:1px solid var(--accent);color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.btn-discord{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:#5865F2;border:none;border-radius:var(--radius-sm);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:var(--sans);position:relative;z-index:1;}
+.btn-discord:hover{background:#4752c4;}
+.login-tutorial{font-size:12px;color:var(--text3);margin-top:14px;cursor:pointer;position:relative;z-index:1;}
+.login-tutorial:hover{color:var(--accent);}
+.login-divider{border:none;border-top:1px solid var(--border);margin:20px 0;position:relative;z-index:1;}
+
+/* ── VERIFY STEP ── */
+#lwStep2{display:none;}
+.verify-avatar{width:60px;height:60px;border-radius:50%;border:2px solid var(--accent);margin:0 auto 12px;display:block;}
+.verify-name{font-size:15px;font-weight:600;text-align:center;margin-bottom:4px;}
+.verify-id{font-size:11px;color:var(--text3);text-align:center;margin-bottom:20px;}
+.verify-status{padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;text-align:center;margin-top:10px;display:none;}
+.vs-checking{background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(234,179,8,0.2);}
+.vs-ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,0.2);}
+.vs-fail{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,0.2);}
+.skip-link{font-size:11px;color:var(--text3);text-align:center;margin-top:12px;cursor:pointer;}
+.skip-link:hover{color:var(--accent);}
+
+/* ── TIER BAR ── */
+.tier-bar{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.tier-left{display:flex;align-items:center;gap:12px;}
+.tier-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;letter-spacing:0.5px;}
+.tb-guest{background:rgba(239,68,68,0.1);color:var(--red);}
+.tb-free{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+.tb-member{background:var(--green-bg);color:var(--green);}
+.tb-pro{background:var(--yellow-bg);color:var(--yellow);}
+.tb-permanent{background:rgba(124,109,240,0.1);color:var(--accent);}
+.tb-whitelist{background:var(--cyan-bg);color:var(--cyan);}
+.tier-info{display:flex;flex-direction:column;}
+.tier-label{font-size:13px;font-weight:500;color:var(--text);}
+.tier-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.quota-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.quota-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--text2);}
+.quota-pill span{font-weight:600;color:var(--text);}
+.btn-upgrade{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:var(--sans);}
+.btn-upgrade:hover{background:var(--accent2);transform:translateY(-1px);}
+
+/* ── SECTION HEADER ── */
+.section-header{margin-bottom:20px;}
+.section-title{font-size:20px;font-weight:700;letter-spacing:-0.3px;margin-bottom:4px;}
+.section-sub{font-size:13px;color:var(--text3);}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.card-title{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── SOURCE TABS ── */
+.source-tabs{display:flex;gap:4px;background:var(--surface2);border-radius:var(--radius-sm);padding:4px;margin-bottom:16px;}
+.source-tab{flex:1;padding:8px;background:transparent;border:none;border-radius:6px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;transition:all 0.15s;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:6px;}
+.source-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.3);}
+
+/* ── DROP ZONE ── */
+.drop-zone{border:1.5px dashed var(--border2);border-radius:var(--radius);padding:40px 20px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:var(--accent-glow);}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.drop-icon{font-size:32px;margin-bottom:10px;}
+.drop-title{font-size:14px;font-weight:500;margin-bottom:4px;}
+.drop-sub{font-size:12px;color:var(--text3);}
+.format-tags{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
+.fmt-tag{font-size:10px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;color:var(--text3);}
+
+/* ── URL INPUT ── */
+.url-input-wrap{display:flex;gap:8px;align-items:stretch;}
+.url-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:var(--sans);}
+.url-input:focus{border-color:var(--accent);}
+.url-input::placeholder{color:var(--text3);}
+.url-status{font-size:12px;margin-top:8px;min-height:18px;}
+.platform-tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.platform-tag{display:flex;align-items:center;gap:5px;font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text3);}
+
+/* ── LOADED FILE ── */
+.loaded-file{display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;}
+.loaded-file.show{display:flex;align-items:center;gap:12px;}
+.loaded-icon{width:40px;height:40px;background:var(--accent-glow);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.loaded-info{flex:1;min-width:0;}
+.loaded-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.loaded-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.loaded-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;flex-shrink:0;}
+.badge-ready{background:var(--green-bg);color:var(--green);}
+.badge-proc{background:var(--yellow-bg);color:var(--yellow);}
+.badge-done{background:var(--accent-glow);color:var(--accent);}
+
+/* ── WAVEFORM ── */
+.waveform-wrap{background:var(--surface2);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:16px;display:none;}
+.waveform-wrap.show{display:block;}
+canvas#waveformCanvas{width:100%;height:72px;display:block;}
+
+/* ── SPEED CONTROL ── */
+.speed-grid{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.sp-btn{padding:7px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:var(--sans);}
+.sp-btn:hover{border-color:var(--border2);color:var(--text);}
+.sp-btn.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent);}
+.speed-custom{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.speed-slider{flex:1;accent-color:var(--accent);}
+.speed-val{font-size:13px;font-weight:600;color:var(--accent);min-width:40px;text-align:right;font-family:var(--mono);}
+
+/* ── RESULT STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;}
+.stat-val{font-size:18px;font-weight:700;color:var(--text);font-family:var(--mono);}
+.stat-lbl{font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:0.5px;}
+
+/* ── UPLOAD TARGET ── */
+.target-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:14px;}
+.target-tab{flex:1;padding:9px;background:transparent;border:none;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;transition:all 0.15s;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:6px;}
+.target-tab:first-child{border-right:1px solid var(--border);}
+.target-tab.active{background:var(--accent-glow);color:var(--accent);}
+
+/* ── FORM ELEMENTS ── */
+.form-group{margin-bottom:12px;}
+.form-label{font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;display:block;}
+.form-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:var(--sans);transition:border 0.15s;}
+.form-input:focus{border-color:var(--accent);}
+.form-input::placeholder{color:var(--text3);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-hint{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5;}
+.form-hint a{color:var(--accent);text-decoration:none;}
+.form-hint a:hover{text-decoration:underline;}
+.cred-saved{font-size:11px;color:var(--green);display:flex;align-items:center;gap:5px;margin-top:6px;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;font-family:var(--sans);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2);}
+.btn-ghost:hover:not(:disabled){background:var(--surface2);color:var(--text);}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover:not(:disabled){filter:brightness(1.1);}
+.btn-full{width:100%;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ── PROGRESS ── */
+.progress-wrap{background:var(--surface2);border-radius:4px;height:4px;overflow:hidden;margin-bottom:16px;display:none;}
+.progress-wrap.show{display:block;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#a78bfa);border-radius:4px;transition:width 0.3s;width:0%;}
+
+/* ── WARN ── */
+.warn-box{background:var(--red-bg);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:12px;display:none;}
+.warn-box.show{display:block;}
+.info-box{background:var(--accent-glow);border:1px solid rgba(124,109,240,0.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--accent);}
+
+/* ── RESULT BOX ── */
+.result-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:12px;color:var(--text2);line-height:2;margin-top:12px;display:none;}
+.result-box.show{display:block;}
+.result-ok{background:var(--green-bg);border-color:rgba(34,197,94,0.2);color:var(--green);}
+.result-err{background:var(--red-bg);border-color:rgba(239,68,68,0.2);color:var(--red);}
+
+/* ── HISTORY ── */
+.history-list{display:flex;flex-direction:column;gap:8px;}
+.history-item{display:flex;align-items:center;gap:14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
+.hist-icon{width:36px;height:36px;background:var(--surface3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.hist-info{flex:1;min-width:0;}
+.hist-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.hist-id{font-size:11px;font-family:var(--mono);color:var(--accent);margin-top:2px;}
+.hist-copy{background:transparent;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text3);cursor:pointer;transition:all 0.15s;font-family:var(--sans);}
+.hist-copy:hover{border-color:var(--accent);color:var(--accent);}
+.hist-empty{text-align:center;padding:40px;color:var(--text3);font-size:13px;}
+
+/* ── PAYMENT MODAL ── */
+.pkg-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.pkg-item{display:flex;align-items:center;gap:14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px;cursor:pointer;transition:all 0.15s;position:relative;}
+.pkg-item:hover,.pkg-item.selected{border-color:var(--accent);background:var(--accent-glow);}
+.pkg-item.selected::after{content:'✓';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--accent);font-weight:700;}
+.pkg-popular{position:absolute;top:-1px;left:14px;font-size:10px;font-weight:600;background:var(--yellow);color:#000;padding:2px 8px;border-radius:0 0 4px 4px;}
+.pkg-icon{font-size:22px;flex-shrink:0;}
+.pkg-info{flex:1;}
+.pkg-name{font-size:13px;font-weight:600;}
+.pkg-desc{font-size:11px;color:var(--text3);margin-top:2px;}
+.pkg-price{font-size:15px;font-weight:700;color:var(--yellow);flex-shrink:0;}
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.pay-method{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 8px;cursor:pointer;text-align:center;transition:all 0.15s;font-size:12px;color:var(--text2);font-family:var(--sans);}
+.pay-method:hover,.pay-method.selected{border-color:var(--accent);color:var(--accent);background:var(--accent-glow);}
+.pay-method-icon{font-size:20px;margin-bottom:4px;}
+.amount-box{display:flex;align-items:center;justify-content:space-between;background:var(--yellow-bg);border:1px solid rgba(234,179,8,0.2);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:14px;}
+.amount-label{font-size:11px;color:var(--text3);}
+.amount-val{font-size:22px;font-weight:700;color:var(--yellow);font-family:var(--mono);}
+.payment-detail{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;text-align:center;margin-bottom:14px;}
+.payment-number{font-size:18px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:2px;margin-bottom:4px;word-break:break-all;}
+.payment-name{font-size:12px;color:var(--text3);}
+.qris-img{width:150px;height:150px;border-radius:8px;margin-bottom:10px;}
+.pay-note{font-size:11px;color:var(--text3);line-height:1.7;margin-bottom:14px;}
+.pay-note span{color:var(--accent);}
+.demo-notice{background:var(--cyan-bg);border:1px solid rgba(6,182,212,0.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--cyan);margin-bottom:14px;display:none;}
+.success-state{text-align:center;padding:20px 0;}
+
+/* ── TUTORIAL MODAL ── */
+.tut-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.tut-tab{flex:1;padding:10px 8px;background:transparent;border:none;font-size:12px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;font-family:var(--sans);line-height:1.4;}
+.tut-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500;}
+.tut-pane{display:none;}
+.tut-pane.active{display:block;}
+.tut-video{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden;position:relative;}
+.tut-video iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.tut-placeholder{text-align:center;color:var(--text3);}
+.tut-placeholder-icon{font-size:28px;margin-bottom:6px;}
+.tut-steps-list{display:flex;flex-direction:column;gap:8px;}
+.tut-step{display:flex;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
+.tut-step-num{width:20px;height:20px;border-radius:50%;background:var(--accent-glow);border:1px solid var(--accent);color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.tut-step-text{font-size:12px;color:var(--text2);line-height:1.7;}
+.tut-step-text b{color:var(--text);}
+.tut-step-text a{color:var(--accent);}
+.tut-nav{display:flex;justify-content:space-between;gap:8px;padding-top:8px;}
+
+/* ── LOG ── */
+.log-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-family:var(--mono);font-size:11px;height:120px;overflow-y:auto;line-height:1.8;}
+.ll-ok{color:var(--green);}
+.ll-err{color:var(--red);}
+.ll-warn{color:var(--yellow);}
+.ll-info{color:var(--text3);}
+
+/* ── TOAST ── */
+#toastWrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999;}
+.toast{padding:10px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;animation:slideIn 0.2s ease;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+.toast.ok{background:var(--green);color:#fff;}
+.toast.er{background:var(--red);color:#fff;}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* ── SPINNER ── */
+.spinner{width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── BATCH ── */
+.batch-item{display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:6px;}
+.batch-name{flex:1;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.batch-status{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;}
+.bs-queue{background:var(--surface3);color:var(--text3);}
+.bs-proc{background:var(--yellow-bg);color:var(--yellow);}
+.bs-done{background:var(--green-bg);color:var(--green);}
+.bs-err{background:var(--red-bg);color:var(--red);}
+
+/* ── LIMIT GATE ── */
+.limit-gate{position:absolute;inset:0;background:rgba(10,10,15,0.9);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--radius);gap:10px;z-index:10;}
+.limit-gate-icon{font-size:28px;}
+.limit-gate-title{font-size:14px;font-weight:700;color:var(--yellow);}
+.limit-gate-sub{font-size:12px;color:var(--text3);text-align:center;padding:0 20px;line-height:1.6;}
+
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN WALL ══════════ -->
+<div id="loginWall">
+  <div class="login-card">
+    <div class="login-glow"></div>
+    <div id="lwStep1">
+      <div class="login-logo">Ahmad<span>Bypass</span></div>
+      <div class="login-ver">V2.0 · ROBLOX AUDIO TOOL BY SALTORIA</div>
+      <div class="login-steps">
+        <div class="login-step"><div class="step-dot">1</div>Login dengan akun Discord kamu</div>
+        <div class="login-step"><div class="step-dot">2</div>Verifikasi join server Saltoria</div>
+        <div class="login-step"><div class="step-dot">3</div>Dapatkan 5 upload gratis per hari</div>
+      </div>
+      <button class="btn-discord" onclick="loginDiscordWall()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Login with Discord
+      </button>
+      <hr class="login-divider">
+      <div class="login-tutorial" onclick="showTutorial()">📖 Tutorial cara menggunakan website ini</div>
+    </div>
+    <div id="lwStep2">
+      <img id="lwAvatar" src="" class="verify-avatar" alt="avatar">
+      <div class="verify-name" id="lwName">—</div>
+      <div class="verify-id" id="lwId">—</div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:6px;">Bergabung ke Server Saltoria</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Untuk akses 5 upload/hari gratis, join server Saltoria Community.</div>
+      <div id="lwVerifyIdle" style="display:flex;flex-direction:column;gap:8px;">
+        <a href="https://discord.gg/VRQFamarnW" target="_blank" id="lwJoinBtn"
+          style="display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:500;text-decoration:none;border-radius:var(--radius-sm);transition:all 0.15s;"
+          onclick="setTimeout(()=>{document.getElementById('lwVerifyCheckBtn').style.display='flex'},2500)">
+          🔗 Buka Server Saltoria
+        </a>
+        <button id="lwVerifyCheckBtn" onclick="checkServerMembership()"
+          style="display:none;align-items:center;justify-content:center;gap:8px;padding:11px;background:var(--green);border:none;color:#fff;font-size:13px;font-weight:500;border-radius:var(--radius-sm);cursor:pointer;width:100%;font-family:var(--sans);">
+          ✅ Sudah Join — Verifikasi
+        </button>
+      </div>
+      <div id="lwVerifyStatus" class="verify-status"></div>
+      <hr class="login-divider">
+      <div class="skip-link" onclick="skipServerVerify()">Sudah punya akses? Lewati verifikasi →</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TUTORIAL MODAL ══════════ -->
+<div class="modal-overlay hidden" id="tutorialModal" onclick="if(event.target===this)closeTutorial()">
+  <div class="modal" style="max-width:580px;">
+    <div class="modal-header">
+      <div class="modal-title">📖 Tutorial Lengkap</div>
+      <button class="modal-close" onclick="closeTutorial()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="tut-tabs">
+        <button class="tut-tab active" id="tutBtn0" onclick="switchTutTab(0)">① Login &<br>Penggunaan</button>
+        <button class="tut-tab" id="tutBtn1" onclick="switchTutTab(1)">② API Key<br>Roblox</button>
+        <button class="tut-tab" id="tutBtn2" onclick="switchTutTab(2)">③ Beli &<br>Berlangganan</button>
+      </div>
+      <div class="tut-pane active" id="tutPane0">
+        <div class="tut-video" id="tutVid0"><div class="tut-placeholder"><div class="tut-placeholder-icon">▶</div><div style="font-size:12px;">Video belum tersedia</div></div></div>
+        <div class="tut-steps-list">
+          <div class="tut-step"><div class="tut-step-num">1</div><div class="tut-step-text">Klik <b>Login with Discord</b> → izinkan akses → login.</div></div>
+          <div class="tut-step"><div class="tut-step-num">2</div><div class="tut-step-text">Join server Saltoria Community → klik Verifikasi → dapat 5 upload gratis/hari.</div></div>
+          <div class="tut-step"><div class="tut-step-num">3</div><div class="tut-step-text">Upload file audio atau paste URL YouTube/SoundCloud.</div></div>
+          <div class="tut-step"><div class="tut-step-num">4</div><div class="tut-step-text">Pilih Speed Multiplier → klik <b>Process Audio</b>.</div></div>
+          <div class="tut-step"><div class="tut-step-num">5</div><div class="tut-step-text">Isi API Key Roblox + User ID → klik <b>Upload ke Roblox</b>. Asset ID muncul di History.</div></div>
+        </div>
+        <div class="tut-nav"><div></div><button class="btn btn-primary" onclick="switchTutTab(1)">Next: API Key →</button></div>
+      </div>
+      <div class="tut-pane" id="tutPane1">
+        <div class="tut-video" id="tutVid1"><div class="tut-placeholder"><div class="tut-placeholder-icon">▶</div><div style="font-size:12px;">Video belum tersedia</div></div></div>
+        <div class="tut-steps-list">
+          <div class="tut-step"><div class="tut-step-num">1</div><div class="tut-step-text">Buka <a href="https://create.roblox.com/dashboard/credentials" target="_blank">create.roblox.com/dashboard/credentials</a></div></div>
+          <div class="tut-step"><div class="tut-step-num">2</div><div class="tut-step-text">Klik <b>Create API Key</b> → beri nama bebas.</div></div>
+          <div class="tut-step"><div class="tut-step-num">3</div><div class="tut-step-text">Tambah <b>Assets API</b> dengan permission <b>asset:read</b> dan <b>asset:write</b>.</div></div>
+          <div class="tut-step"><div class="tut-step-num">4</div><div class="tut-step-text">IP Addresses: tambah <b>0.0.0.0/0</b> → klik <b>Save & Generate Key</b>.</div></div>
+          <div class="tut-step"><div class="tut-step-num">5</div><div class="tut-step-text">Copy API Key — hanya ditampilkan sekali. Paste di kolom API Key website ini.</div></div>
+        </div>
+        <div class="tut-nav">
+          <button class="btn btn-ghost" onclick="switchTutTab(0)">← Kembali</button>
+          <button class="btn btn-primary" onclick="switchTutTab(2)">Next: Beli Limit →</button>
+        </div>
+      </div>
+      <div class="tut-pane" id="tutPane2">
+        <div class="tut-video" id="tutVid2"><div class="tut-placeholder"><div class="tut-placeholder-icon">▶</div><div style="font-size:12px;">Video belum tersedia</div></div></div>
+        <div class="tut-steps-list">
+          <div class="tut-step"><div class="tut-step-num">1</div><div class="tut-step-text">Klik tombol <b>Upgrade</b> di tier bar atau saat limit habis.</div></div>
+          <div class="tut-step"><div class="tut-step-num">2</div><div class="tut-step-text">Pilih paket: <b>+10 Limit</b>, <b>Weekly</b>, <b>Monthly</b>, atau <b>Permanent</b>.</div></div>
+          <div class="tut-step"><div class="tut-step-num">3</div><div class="tut-step-text">Pilih metode bayar → transfer sesuai nominal tepat (termasuk kode unik 3 digit).</div></div>
+          <div class="tut-step"><div class="tut-step-num">4</div><div class="tut-step-text">Masukkan nama pengirim → klik <b>Konfirmasi</b>. Tier aktif setelah verifikasi admin (~10 menit).</div></div>
+        </div>
+        <div class="tut-nav">
+          <button class="btn btn-ghost" onclick="switchTutTab(1)">← Kembali</button>
+          <button class="btn btn-primary" onclick="closeTutorial()">✓ Mulai Pakai</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ UPGRADE / PAYMENT MODAL ══════════ -->
+<div class="modal-overlay hidden" id="upgradeModal" onclick="if(event.target===this)closeUpgradeModal()">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <div class="modal-title">⭐ Upgrade Akses</div>
+      <button class="modal-close" onclick="closeUpgradeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="payStepA">
+        <div id="demoPriceNote" class="demo-notice">✦ Mode Demo — Semua harga Rp1.000 untuk recording tutorial.</div>
+        <div class="pkg-list" id="payPackageList"></div>
+        <div style="font-size:11px;color:var(--text3);line-height:1.7;margin-bottom:14px;">⚠ Harga termasuk kode unik 3 digit untuk identifikasi · Aktif setelah konfirmasi admin</div>
+        <button class="btn btn-primary btn-full" onclick="payGoMethod()">Lanjut Pilih Metode Bayar →</button>
+      </div>
+      <div id="payStepB" style="display:none;">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">Metode Pembayaran</div>
+        <div class="pay-methods">
+          <div class="pay-method" onclick="selectPayMethod('dana',this)"><div class="pay-method-icon">💙</div>DANA</div>
+          <div class="pay-method" onclick="selectPayMethod('gopay',this)"><div class="pay-method-icon">💚</div>GoPay</div>
+          <div class="pay-method" onclick="selectPayMethod('qris',this)"><div class="pay-method-icon">📱</div>QRIS</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" style="flex:1" onclick="payGoPackage()">← Kembali</button>
+          <button class="btn btn-primary" style="flex:2" onclick="payGoDetail()">Lihat Detail Bayar →</button>
+        </div>
+      </div>
+      <div id="payStepC" style="display:none;">
+        <div class="amount-box"><div><div class="amount-label">TOTAL BAYAR</div><div style="font-size:12px;color:var(--text3);margin-top:2px;" id="payDetailPkg">—</div></div><div class="amount-val" id="payDetailAmt">—</div></div>
+        <div class="payment-detail">
+          <div style="font-size:11px;color:var(--text3);letter-spacing:1px;margin-bottom:10px;" id="payDetailMethod">—</div>
+          <div id="payDetailNum">—</div>
+          <div class="payment-name" id="payDetailName">—</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;">Transfer <b style="color:var(--yellow)">TEPAT</b> sesuai nominal · 3 digit terakhir = kode unik kamu</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama Pengirim</label>
+          <input type="text" class="form-input" id="payProofName" placeholder="Nama di rekening / e-wallet kamu">
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" style="flex:1" onclick="payGoMethod()">← Kembali</button>
+          <button class="btn btn-primary" style="flex:2" onclick="submitPayment()">✓ Konfirmasi Sudah Transfer</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px;">Tier diupdate setelah admin verifikasi · Biasanya &lt;10 menit</div>
+      </div>
+      <div id="payStepD" class="success-state" style="display:none;">
+        <div style="font-size:40px;margin-bottom:12px;">✅</div>
+        <div style="font-size:16px;font-weight:700;color:var(--green);margin-bottom:8px;">Konfirmasi Terkirim!</div>
+        <div style="font-size:13px;color:var(--text3);line-height:1.8;">Admin sudah dapat notifikasi.<br>Tier aktif setelah verifikasi · <span style="color:var(--accent);">&lt;10 menit</span></div>
+        <button class="btn btn-primary" style="margin-top:20px;" onclick="closeUpgradeModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-name">Ahmad<span>Bypass</span></div>
+        <div class="brand-ver">V2.0 · BY SALTORIA</div>
+      </div>
+    </div>
+    <div class="nav-section">Menu</div>
+    <button class="nav-item active" id="nav-converter" onclick="switchView('converter')">🎵 Converter</button>
+    <button class="nav-item" id="nav-batch" onclick="switchView('batch')">📦 Batch Process</button>
+    <button class="nav-item" id="nav-history" onclick="switchView('history')">📋 History</button>
+    <div class="nav-section">Tools</div>
+    <button class="nav-item" onclick="showTutorial()">📖 Tutorial</button>
+    <button class="nav-item" onclick="showUpgradeModal()">⭐ Upgrade</button>
+    <div style="margin-top:auto;"></div>
+    <div class="sidebar-footer">
+      <div class="user-chip" id="sidebarUser">
+        <div class="user-avatar-placeholder">👤</div>
+        <div><div class="user-name" id="sidebarName">—</div><div class="user-tier" id="sidebarTier">—</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- TIER BAR -->
+    <div class="tier-bar" id="tierBar">
+      <div class="tier-left">
+        <div class="tier-badge tb-guest" id="tierBadge">Guest</div>
+        <div class="tier-info">
+          <div class="tier-label" id="tierLabel">—</div>
+          <div class="tier-sub" id="tierSub">—</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="quota-pills" id="tierQuota" style="display:none;">
+          <div class="quota-pill">Upload: <span id="qUploadVal">—</span></div>
+          <div class="quota-pill">Batch: <span id="qBatchVal">—</span></div>
+        </div>
+        <button class="btn-upgrade hidden" id="tierUpgradeBtn" onclick="showUpgradeModal()">⭐ Upgrade</button>
+      </div>
+    </div>
+
+    <!-- ── VIEW: CONVERTER ── -->
+    <div id="view-converter">
+      <div class="section-header">
+        <div class="section-title">Audio Converter</div>
+        <div class="section-sub">Upload file atau paste URL YouTube/SoundCloud · Export MP3 320kbps</div>
+      </div>
+
+      <!-- SOURCE CARD -->
+      <div class="card">
+        <div class="card-title">Audio Source</div>
+        <div class="source-tabs">
+          <button class="source-tab active" id="srcTabFile" onclick="switchSrcTab('file')">📁 Upload File</button>
+          <button class="source-tab" id="srcTabUrl" onclick="switchSrcTab('url')">🔗 YouTube / SoundCloud</button>
+        </div>
+
+        <!-- File Upload -->
+        <div id="srcPaneFile">
+          <div class="drop-zone" id="dropZone" ondragover="onDrag(event)" ondragleave="offDrag(event)" ondrop="onDrop(event)">
+            <input type="file" id="fileInput" accept="audio/*" onchange="handleFile(this.files[0])">
+            <div class="drop-icon">🎵</div>
+            <div class="drop-title">Drag & drop audio file</div>
+            <div class="drop-sub">atau klik untuk pilih dari perangkat</div>
+            <div class="format-tags">
+              <span class="fmt-tag">MP3</span><span class="fmt-tag">WAV</span><span class="fmt-tag">OGG</span><span class="fmt-tag">FLAC</span><span class="fmt-tag">AAC</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- URL Input -->
+        <div id="srcPaneUrl" style="display:none;">
+          <div class="url-input-wrap">
+            <input type="text" class="url-input" id="urlInput" placeholder="https://youtube.com/watch?v=... atau https://soundcloud.com/...">
+            <button class="btn btn-primary" id="urlFetchBtn" onclick="fetchFromUrl(document.getElementById('urlInput').value)">⬇ Fetch</button>
+          </div>
+          <div class="url-status ll-info" id="urlStatus"></div>
+          <div class="platform-tags" style="margin-top:10px;">
+            <span class="platform-tag">▶ YouTube</span>
+            <span class="platform-tag">☁ SoundCloud</span>
+            <span class="platform-tag">🎵 Pastikan link public</span>
+          </div>
+        </div>
+
+        <!-- Loaded File -->
+        <div class="loaded-file" id="audioLoaded" style="margin-top:12px;">
+          <div class="loaded-icon">🎵</div>
+          <div class="loaded-info">
+            <div class="loaded-name" id="audioName">—</div>
+            <div class="loaded-meta" id="audioMeta">—</div>
+          </div>
+          <span class="loaded-badge badge-ready" id="audioStatus">READY</span>
+        </div>
+        <div class="warn-box" id="sizeWarn"></div>
+      </div>
+
+      <!-- WAVEFORM -->
+      <div class="waveform-wrap" id="waveformWrap">
+        <canvas id="waveformCanvas"></canvas>
+      </div>
+
+      <!-- PROCESS CARD -->
+      <div class="card" id="processCard" style="display:none;">
+        <div class="card-title">Speed Settings</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:12px;color:var(--text3);">Speed Multiplier</div>
+          <div class="speed-val" id="speedDisplay">2.2x</div>
+        </div>
+        <div class="speed-grid">
+          <button class="sp-btn" id="sp1.5" onclick="setSpeed(1.5)">1.5x</button>
+          <button class="sp-btn" id="sp2.0" onclick="setSpeed(2.0)">2.0x</button>
+          <button class="sp-btn active" id="sp2.2" onclick="setSpeed(2.2)">2.2x</button>
+          <button class="sp-btn" id="sp2.5" onclick="setSpeed(2.5)">2.5x</button>
+          <button class="sp-btn" id="sp3.0" onclick="setSpeed(3.0)">3.0x</button>
+        </div>
+        <div class="speed-custom">
+          <input type="range" class="speed-slider" id="customSpeed" min="1.0" max="5.0" step="0.1" value="2.2" oninput="updateCustomSpeed(this.value)">
+        </div>
+        <div class="info-box" id="speedRec" style="margin-bottom:14px;">
+          ⚡ Speed <strong id="recSpeedUp">2.2x</strong> → Normal speed in-game: <strong id="recNormalSpeed">0.45x</strong>
+        </div>
+        <div class="warn-box" id="durationWarn"></div>
+        <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+        <button class="btn btn-primary btn-full" id="processBtn" onclick="processAudio()">⚡ Process Audio</button>
+      </div>
+
+      <!-- RESULT CARD -->
+      <div class="card" id="resultSection" style="display:none;">
+        <div class="card-title">Result</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-val" id="statSpeed">—</div><div class="stat-lbl">SPEED</div></div>
+          <div class="stat-card"><div class="stat-val" id="statDurOld">—</div><div class="stat-lbl">ORIGINAL</div></div>
+          <div class="stat-card"><div class="stat-val" id="statDurNew">—</div><div class="stat-lbl">OUTPUT</div></div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Preview Output</div>
+          <audio id="audioB" controls style="width:100%;accent-color:var(--accent);"></audio>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="downloadMp3()" id="mp3Btn" style="flex:1;">⬇ Download MP3</button>
+          <button class="btn btn-ghost" onclick="downloadWav()" style="flex:1;">⬇ Download WAV</button>
+          <button class="btn btn-ghost" onclick="scrollToUpload()" style="flex:1;">🚀 Upload Roblox</button>
+        </div>
+      </div>
+
+      <!-- ROBLOX UPLOAD CARD -->
+      <div class="card" id="robloxCard" style="display:none;position:relative;">
+        <div class="card-title">Upload ke Roblox</div>
+        <div class="form-group">
+          <label class="form-label">Nama Aset</label>
+          <input type="text" class="form-input" id="rblxAssetName" placeholder="Nama audio di Roblox">
+        </div>
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <input type="password" class="form-input" id="rblxApiKey" placeholder="API key dari create.roblox.com">
+        </div>
+
+        <!-- Upload Target -->
+        <div class="form-group">
+          <label class="form-label">Upload Target</label>
+          <div class="target-tabs">
+            <button class="target-tab active" id="targetPersonalBtn" onclick="setUploadTarget('personal')">👤 Akun Pribadi</button>
+            <button class="target-tab" id="targetCommunityBtn" onclick="setUploadTarget('community')">🏰 Community / Group</button>
+          </div>
+          <div id="targetPersonalFields">
+            <input type="text" class="form-input" id="rblxUserId" placeholder="User ID (contoh: 9197728639)">
+            <div class="form-hint">Temukan User ID di <a href="https://www.roblox.com/users/profile" target="_blank">roblox.com/users/profile</a></div>
+          </div>
+          <div id="targetCommunityFields" class="hidden">
+            <div class="form-grid">
+              <div><input type="text" class="form-input" id="rblxUserIdComm" placeholder="User ID kamu"><div class="form-hint">User ID pemilik</div></div>
+              <div><input type="text" class="form-input" id="rblxGroupId" placeholder="Group ID"><div class="form-hint">Dari URL halaman group</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cred-saved hidden" id="credSavedNotice">✓ Credentials tersimpan dari sesi sebelumnya</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">🔒 API Key dikirim langsung ke Roblox · Format upload: <strong style="color:var(--accent)">MP3 320kbps</strong></div>
+        <div id="rblxResult"></div>
+        <button class="btn btn-success btn-full" id="rblxBtn" onclick="uploadToRoblox()">🚀 Upload ke Roblox Creator Hub</button>
+      </div>
+
+      <!-- LOG -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">System Log</div>
+        <div class="log-box" id="logBox"><span class="ll-info">// AhmadBypass v2 ready</span><br></div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-ghost" onclick="resetAll()" style="font-size:11px;padding:6px 12px;">🔄 Reset</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('logBox').innerHTML=''" style="font-size:11px;padding:6px 12px;">🗑 Clear Log</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: BATCH ── -->
+    <div id="view-batch" style="display:none;">
+      <div class="section-header">
+        <div class="section-title">Batch Process</div>
+        <div class="section-sub">Process beberapa file sekaligus</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Files</div>
+        <div class="drop-zone" id="batchDrop" ondragover="onDrag(event)" ondragleave="offDrag(event)" ondrop="onBatchDrop(event)" style="margin-bottom:12px;">
+          <input type="file" accept="audio/*" multiple onchange="addBatchFiles(this.files)">
+          <div class="drop-icon">📦</div>
+          <div class="drop-title">Drop beberapa file audio</div>
+          <div class="drop-sub">atau klik untuk pilih</div>
+        </div>
+        <div id="batchEmpty" style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Belum ada file</div>
+        <div id="batchList"></div>
+        <div id="batchControls" class="hidden" style="margin-top:14px;">
+          <div class="speed-custom" style="margin-bottom:12px;">
+            <span style="font-size:12px;color:var(--text3);">Speed:</span>
+            <input type="range" class="speed-slider" min="1.0" max="5.0" step="0.1" value="2.2" oninput="updateBatchSpeed(this.value)">
+            <span class="speed-val" id="batchSpeedDisp">2.2x</span>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="batchStartBtn" onclick="startBatch()" style="flex:1;">⚡ Process All</button>
+            <button class="btn btn-ghost" onclick="clearBatch()" style="flex:1;">🗑 Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: HISTORY ── -->
+    <div id="view-history" style="display:none;">
+      <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="section-title">History</div>
+          <div class="section-sub">Riwayat upload ke Roblox</div>
+        </div>
+        <button class="btn btn-ghost" onclick="clearHistory()" style="font-size:12px;">🗑 Clear All</button>
+      </div>
+      <div class="history-list" id="histList"></div>
+      <div class="hist-empty hidden" id="histEmpty">Belum ada history upload</div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toastWrap"></div>
+<audio id="audioA" style="display:none;"></audio>
+
+<!-- lamejs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════
+// ── KONFIGURASI — EDIT BAGIAN INI ──
+// ══════════════════════════════════════════════════════════
+
+const DISCORD_CLIENT_ID   = '1509490238115020820';
+const DISCORD_GUILD_ID    = '1432123561849655527';
+const FIREBASE_URL        = 'https://ahmadsaltoriabypass-default-rtdb.asia-southeast1.firebasedatabase.app';
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/XXXXXXX/XXXXXXX'; // ← GANTI
+
+// ▼ Whitelist — gratis unlimited selamanya
+const WHITELIST_IDS = [
+  '1336957387155968164', // slyfaugts (owner)
+];
+
+// ▼ Demo — semua harga jadi Rp1.000 untuk recording tutorial
+const DEMO_IDS = [
+  '1336957387155968164', // slyfaugts
+];
+
+// ▼ Payment info
+const PAYMENT_INFO = {
+  dana:  { number: '085137944998', name: 'Aahmad Store (DANA)'  },
+  gopay: { number: '085137944998', name: 'Aahmad Store (GoPay)' },
+  qris:  { number: 'NMID: ID1024348725192', name: 'AAHMAD STORE' },
+};
+
+
+// ══════════════════════════════════════════════════════════
+// ── STATE ──
+// ══════════════════════════════════════════════════════════
+let audioBuffer = null, processedBuffer = null, processedBlob = null;
+let currentSpeed = 2.2, originalDuration = 0, audioCtx = null;
+let sourceFileName = 'audio', batchQueue = [], batchSpeed = 2.2;
+const PROXY = '/api/upload';
+
+// ══════════════════════════════════════════════════════════
+// ── TIER SYSTEM ──
+// ══════════════════════════════════════════════════════════
+/*
+  TIER LEVELS:
+  guest      → belum login Discord
+  free       → login, tapi belum join server         → 3 upload/hari
+  member     → login + verified join server           → 5 upload/hari
+  topup      → beli limit (+10 per pembelian)         → uploadExtra tracks per day
+  weekly     → langganan 7 hari                       → unlimited 7 hari
+  monthly    → langganan 30 hari                      → unlimited 30 hari
+  permanent  → beli sekali selamanya                  → unlimited forever
+  whitelist  → ID di WHITELIST_IDS                    → unlimited forever (gratis)
+*/
+
+const TIER_CONFIG = {
+  guest:     { uploadPerDay: 0,  batchMax: 0,  unlimited: false, label: '⊘ GUEST',        badge: 'tb-guest',     bar: 't-guest'     },
+  free:      { uploadPerDay: 3,  batchMax: 3,  unlimited: false, label: '◈ FREE',          badge: 'tb-free',      bar: 't-free'      },
+  member:    { uploadPerDay: 5,  batchMax: 5,  unlimited: false, label: '✦ MEMBER',        badge: 'tb-member',    bar: 't-member'    },
+  topup:     { uploadPerDay: -1, batchMax: 20, unlimited: false, label: '💎 TOPUP',         badge: 'tb-pro',       bar: 't-pro'       },
+  weekly:    { uploadPerDay: -1, batchMax: -1, unlimited: true,  label: '⭐ WEEKLY PRO',    badge: 'tb-pro',       bar: 't-pro'       },
+  monthly:   { uploadPerDay: -1, batchMax: -1, unlimited: true,  label: '⭐ MONTHLY PRO',   badge: 'tb-pro',       bar: 't-pro'       },
+  permanent: { uploadPerDay: -1, batchMax: -1, unlimited: true,  label: '👑 PERMANENT',     badge: 'tb-permanent', bar: 't-permanent' },
+  whitelist: { uploadPerDay: -1, batchMax: -1, unlimited: true,  label: '✦ WHITELISTED',   badge: 'tb-whitelist', bar: 't-whitelist' },
+};
+
+let currentTier = 'guest';
+let currentDiscordUser = null;
+let serverVerified = false;
+
+// ── Firebase tier fetch ──
+async function fetchUserTier(discordId) {
+  try {
+    const res = await fetch(`/api/user-tier?discordId=${discordId}`);
+    if (!res.ok) return { tier: 'free', credits: 0, expire: null };
+    return await res.json();
+  } catch {
+    return { tier: 'free', credits: 0, expire: null };
+  }
+}
+
+// Cache tier per session
+let cachedTierData = null;
+
+function getTierForUser(discordId) {
+  if (!discordId) return 'guest';
+  if (WHITELIST_IDS.includes(discordId)) return 'whitelist';
+  // Return cached tier from Firebase fetch (done at login)
+  return cachedTierData?.tier || 'free';
+}
+
+// ── Topup credits (per-user localStorage) ──
+function getTopupCredits(discordId) {
+  try { return parseInt(localStorage.getItem('ab_topup_' + discordId) || '0'); } catch { return 0; }
+}
+function addTopupCredits(discordId, amount) {
+  const cur = getTopupCredits(discordId);
+  localStorage.setItem('ab_topup_' + discordId, cur + amount);
+}
+
+// ── Usage counter ──
+function getUsageKey(id) { return 'ab_usage_' + id; }
+function getUsage(id) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(getUsageKey(id)) || 'null');
+    const today = new Date().toDateString();
+    if (!raw || raw.date !== today) return { date: today, uploads: 0 };
+    return raw;
+  } catch { return { date: new Date().toDateString(), uploads: 0 }; }
+}
+function incrementUpload(id) {
+  const u = getUsage(id);
+  u.uploads++;
+  localStorage.setItem(getUsageKey(id), JSON.stringify(u));
+  // Deduct topup if applicable
+  if (currentTier === 'topup') {
+    const credits = getTopupCredits(id);
+    if (credits > 0) localStorage.setItem('ab_topup_' + id, Math.max(0, credits - 1));
+  }
+}
+function getUploadCount(id) { return getUsage(id).uploads; }
+
+// ── Update Tier UI ──
+function updateTierUI() {
+  const user = currentDiscordUser;
+  const id = user?.id || null;
+  currentTier = getTierForUser(id);
+  const cfg = TIER_CONFIG[currentTier];
+
+  const bar   = document.getElementById('tierBar');
+  const badge = document.getElementById('tierBadge');
+  const label = document.getElementById('tierLabel');
+  const sub   = document.getElementById('tierSub');
+  const quota = document.getElementById('tierQuota');
+  const upBtn = document.getElementById('tierUpgradeBtn');
+  if(!bar) return; // DOM not ready yet
+
+  // Update tier bar class
+  bar.className = 'tier-bar';
+  badge.className = 'tier-badge ' + cfg.badge;
+  badge.textContent = cfg.label;
+
+  const used  = id ? getUploadCount(id) : 0;
+  const limit = cfg.uploadPerDay;
+  const unlimited = limit === -1;
+
+  if (currentTier === 'guest') {
+    label.textContent = 'Login Discord untuk akses fitur';
+    sub.textContent = 'Upload ke Roblox membutuhkan akun Discord';
+    if(quota) quota.style.display = 'none';
+    if(upBtn) upBtn.classList.add('hidden');
+  } else {
+    const name = user?.global_name || user?.username || 'USER';
+    label.textContent = unlimited
+      ? 'Selamat datang, ' + name + ' — Unlimited Access'
+      : name + ' — ' + Math.max(0, limit - used) + ' upload tersisa hari ini';
+
+    const tierDesc = {
+      free:      `Free: ${used}/${limit} upload · Join server dapat +2 limit`,
+      member:    `Member: ${used}/${limit} upload/hari`,
+      topup:     `Topup: ${getTopupCredits(id)} kredit tersisa`,
+      weekly:    `Weekly PRO — Unlimited upload & batch`,
+      monthly:   `Monthly PRO — Unlimited upload & batch`,
+      permanent: `Permanent — Unlimited selamanya 👑`,
+      whitelist: `Whitelisted — PRO gratis selamanya ✦`,
+    };
+    sub.textContent = tierDesc[currentTier] || '';
+
+    if(quota) quota.style.display = '';
+    const qUpload = document.getElementById('qUploadVal');
+    const qBatch  = document.getElementById('qBatchVal');
+    if(qUpload) qUpload.textContent = unlimited ? '∞' : used+'/'+limit;
+    if(qBatch)  qBatch.textContent  = cfg.batchMax === -1 ? '∞' : cfg.batchMax;
+    if(upBtn) upBtn.classList.toggle('hidden', unlimited);
+  }
+
+  // Update sidebar
+  const sName = document.getElementById('sidebarName');
+  const sTier = document.getElementById('sidebarTier');
+  if(sName && user) sName.textContent = user.global_name || user.username;
+  if(sTier) sTier.textContent = currentTier.toUpperCase();
+
+  updateUploadGate();
+}
+
+function updateUploadGate() {
+  const robloxCard = document.getElementById('robloxCard');
+  if (!robloxCard) return;
+  robloxCard.querySelectorAll('.limit-gate').forEach(g => g.remove());
+  robloxCard.style.position = 'relative';
+
+  const id = currentDiscordUser?.id;
+  const cfg = TIER_CONFIG[currentTier];
+
+  if (!cfg.uploadPerDay && currentTier !== 'guest') return; // unlimited, no gate
+
+  if (currentTier === 'guest') return; // gate handled by login wall
+
+  if (cfg.uploadPerDay !== -1) {
+    const used = getUploadCount(id);
+    if (used >= cfg.uploadPerDay) {
+      const gate = document.createElement('div');
+      gate.className = 'limit-gate';
+      gate.innerHTML = `
+        <div class="limit-gate-icon">⏳</div>
+        <div class="limit-gate-title">LIMIT HARIAN TERCAPAI</div>
+        <div class="limit-gate-sub">Kamu sudah pakai ${used}/${cfg.uploadPerDay} upload hari ini.<br>Reset tengah malam · Upgrade untuk lebih banyak limit</div>
+        <button class="btn btn-cyan" style="padding:10px 20px;font-size:9px;margin-top:4px;" onclick="showUpgradeModal()">⭐ UPGRADE SEKARANG</button>`;
+      robloxCard.appendChild(gate);
+    }
+  }
+}
+
+// ── Upload/batch guard ──
+function canDoUpload() {
+  const cfg = TIER_CONFIG[currentTier];
+  if (currentTier === 'guest') { toast('Login Discord dulu!', 'er'); return false; }
+  if (cfg.uploadPerDay !== -1) {
+    const used = getUploadCount(currentDiscordUser?.id);
+    if (used >= cfg.uploadPerDay) {
+      showUpgradeModal();
+      toast(`Limit ${cfg.uploadPerDay} upload/hari tercapai!`, 'er');
+      return false;
+    }
+  }
+  return true;
+}
+function canDoBatch(count) {
+  const cfg = TIER_CONFIG[currentTier];
+  if (currentTier === 'guest') { toast('Login Discord dulu!', 'er'); return false; }
+  if (cfg.batchMax !== -1 && count > cfg.batchMax) {
+    toast(`Tier kamu max ${cfg.batchMax} file batch. Upgrade untuk unlimited!`, 'er');
+    showUpgradeModal();
+    return false;
+  }
+  return true;
+}
+
+// ══════════════════════════════════════════════════════════
+// ── LOGIN WALL ──
+// ══════════════════════════════════════════════════════════
+function loginDiscordWall() {
+  const params = new URLSearchParams({
+    client_id: DISCORD_CLIENT_ID,
+    redirect_uri: window.location.origin + '/api/discord-callback',
+    response_type: 'code',
+    scope: 'identify guilds.members.read',
+  });
+  const url = 'https://discord.com/api/oauth2/authorize?' + params;
+  const popup = window.open(url, 'discord-login', 'width=500,height=700,scrollbars=yes');
+  if (!popup) { toast('Popup diblokir! Izinkan popup untuk login.', 'er'); return; }
+  window.addEventListener('message', onDiscordLoginWall);
+}
+
+function onDiscordLoginWall(e) {
+  if (!e.data || e.data.type !== 'DISCORD_LOGIN') return;
+  window.removeEventListener('message', onDiscordLoginWall);
+  const user = e.data.user;
+  if (!user) { toast('Login Discord gagal', 'er'); return; }
+  currentDiscordUser = user;
+  localStorage.setItem('ab_discord_user', JSON.stringify(user));
+  // Show step 2
+  document.getElementById('lwStep1').style.display = 'none';
+  document.getElementById('lwStep2').style.display = '';
+  document.getElementById('lwAvatar').src = user.avatar;
+  document.getElementById('lwName').textContent = user.global_name || user.username;
+  document.getElementById('lwId').textContent = 'Discord ID: ' + user.id;
+}
+
+function checkServerMembership() {
+  const user = currentDiscordUser;
+  if (!user) return;
+  const statusEl = document.getElementById('lwVerifyStatus');
+  statusEl.style.display = 'flex';
+  statusEl.className = 'verify-status vs-checking';
+  statusEl.textContent = '⏳ Mengecek keanggotaan server...';
+  document.getElementById('lwVerifyCheckBtn').disabled = true;
+
+  // Call our /api/discord-callback with guild check param
+  // Since we can't directly call Discord API from client without token,
+  // we check via our server endpoint
+  fetch('/api/check-guild?userId=' + user.id + '&guildId=' + DISCORD_GUILD_ID, {
+    headers: { 'x-discord-token': user.accessToken || '' }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.member) {
+      serverVerified = true;
+      localStorage.setItem('ab_server_verified_' + user.id, '1');
+      statusEl.className = 'verify-status vs-ok';
+      statusEl.textContent = '✓ Berhasil! Kamu sudah join Saltoria Community';
+      setTimeout(() => enterApp(), 1200);
+    } else {
+      statusEl.className = 'verify-status vs-fail';
+      statusEl.textContent = '✗ Kamu belum join server. Klik link di atas dulu!';
+      document.getElementById('lwVerifyCheckBtn').disabled = false;
+    }
+  })
+  .catch(() => {
+    // Fallback: allow with free tier if API not available
+    statusEl.className = 'verify-status vs-fail';
+    statusEl.textContent = '⚠ Verifikasi tidak tersedia. Masuk dengan limit default.';
+    setTimeout(() => enterApp(), 1500);
+    document.getElementById('lwVerifyCheckBtn').disabled = false;
+  });
+}
+
+function skipServerVerify() {
+  enterApp();
+}
+
+async function enterApp() {
+  const wall = document.getElementById('loginWall');
+  if(wall) wall.style.display = 'none';
+
+  const user = currentDiscordUser;
+  if (user) {
+    // Server verified badge
+    if (user.isMember) {
+      localStorage.setItem('ab_server_verified_' + user.id, '1');
+    }
+
+    // Fetch tier from Firebase
+    log('Mengambil data tier dari server...');
+    cachedTierData = await fetchUserTier(user.id);
+    if (WHITELIST_IDS.includes(user.id)) cachedTierData = { tier: 'whitelist', credits: 0, expire: null };
+    log('Tier: ' + cachedTierData.tier, 'ok');
+
+    // Load saved credentials
+    const creds = loadCredentials(user.id);
+    if (creds) {
+      const ak = document.getElementById('rblxApiKey');
+      const ui = document.getElementById('rblxUserId');
+      const uc = document.getElementById('rblxUserIdComm');
+      const gi = document.getElementById('rblxGroupId');
+      const cn = document.getElementById('credSavedNotice');
+      if(ak && creds.apiKey) ak.value = creds.apiKey;
+      if(ui && creds.userId) ui.value = creds.userId;
+      if(uc && creds.userIdComm) uc.value = creds.userIdComm;
+      if(gi && creds.groupId) gi.value = creds.groupId;
+      if(creds.uploadTarget) setUploadTarget(creds.uploadTarget);
+      if(cn) cn.classList.remove('hidden');
+    }
+
+    toast('Selamat datang, ' + (user.global_name || user.username) + '! 👋');
+    log('Login: ' + (user.global_name || user.username) + ' (' + user.id + ')', 'ok');
+  }
+  updateTierUI();
+  renderHistory();
+}
+
+function logoutAndReset() {
+  currentDiscordUser = null;
+  cachedTierData = null;
+  localStorage.removeItem('ab_discord_user');
+  const wall = document.getElementById('loginWall');
+  if(wall){ wall.style.display = 'flex'; }
+  const lwStep1 = document.getElementById('lwStep1');
+  const lwStep2 = document.getElementById('lwStep2');
+  if(lwStep1) lwStep1.style.display = '';
+  if(lwStep2) lwStep2.style.display = 'none';
+  const lvs = document.getElementById('lwVerifyStatus');
+  if(lvs){ lvs.style.display='none'; lvs.className='verify-status'; }
+  const lvcb = document.getElementById('lwVerifyCheckBtn');
+  if(lvcb){ lvcb.style.display='none'; lvcb.disabled=false; }
+  updateTierUI();
+  toast('Logged out');
+  log('Discord logout', 'warn');
+}
+
+// ══════════════════════════════════════════════════════════
+// ── TUTORIAL ──
+// ══════════════════════════════════════════════════════════
+// ▼ GANTI URL video tutorial di sini setelah kamu upload
+const TUTORIAL_VIDEOS = [
+  '',  // Tahap 1: Login & Penggunaan — isi dengan YouTube embed URL
+  '',  // Tahap 2: API Key Roblox
+  '',  // Tahap 3: Beli & Berlangganan
+];
+
+function showTutorial() {
+  TUTORIAL_VIDEOS.forEach((url, i) => {
+    const box = document.getElementById('tutVid' + i);
+    if (!box) return;
+    if (url) {
+      box.innerHTML = `<iframe src="${url}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    }
+  });
+  document.getElementById('tutorialModal').classList.remove('hidden');
+  switchTutTab(0);
+}
+function closeTutorial() { document.getElementById('tutorialModal').classList.add('hidden'); }
+function switchTutTab(i) {
+  [0,1,2].forEach(j => {
+    document.getElementById('tutPane'+j).classList.toggle('active', j===i);
+    document.getElementById('tutBtn'+j).classList.toggle('active', j===i);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// ── PAYMENT SYSTEM ──
+// ══════════════════════════════════════════════════════════
+const PACKAGES = [
+  { id: 'topup',     icon: '💎', name: '+10 UPLOAD LIMIT',    desc: '10 upload tambahan, tidak expired · ditambah ke kredit kamu',  price: 5000,  demoPrice: 1000 },
+  { id: 'weekly',    icon: '📅', name: 'WEEKLY PRO',          desc: 'Unlimited upload & batch selama 7 hari · auto-expired',         price: 15000, demoPrice: 1000 },
+  { id: 'monthly',   icon: '⭐', name: 'MONTHLY PRO',         desc: 'Unlimited upload & batch selama 30 hari · auto-expired',        price: 35000, demoPrice: 1000, popular: true },
+  { id: 'permanent', icon: '👑', name: 'PERMANENT ACCESS',    desc: 'Unlimited upload & batch selamanya · bayar sekali, pakai forever', price: 70000, demoPrice: 1000 },
+];
+
+let selectedPackage = null;
+let selectedMethod  = null;
+let uniqueCode      = 0;
+
+function isDemoUser() {
+  return currentDiscordUser && DEMO_IDS.includes(currentDiscordUser.id);
+}
+
+function showUpgradeModal() {
+  selectedPackage = null;
+  selectedMethod  = null;
+  // Show demo note if applicable
+  document.getElementById('demoPriceNote').style.display = isDemoUser() ? '' : 'none';
+  // Render package list
+  const list = document.getElementById('payPackageList');
+  list.innerHTML = PACKAGES.map(pkg => {
+    const price = isDemoUser() ? pkg.demoPrice : pkg.price;
+    const priceStr = 'Rp' + price.toLocaleString('id-ID');
+    return `
+      <div class="pay-pkg${pkg.popular?' featured':''}" onclick="selectPackage('${pkg.id}',this)">
+        <div class="pay-pkg-icon">${pkg.icon}</div>
+        <div class="pay-pkg-info">
+          <div class="pay-pkg-name">${pkg.popular?'<span style="font-size:8px;background:var(--yellow);color:#000;padding:2px 6px;margin-right:6px;">POPULAR</span>':''}${pkg.name}</div>
+          <div class="pay-pkg-desc">${pkg.desc}</div>
+        </div>
+        <div class="pay-pkg-price">${priceStr}</div>
+      </div>`;
+  }).join('');
+  // Show step A
+  ['payStepA','payStepB','payStepC','payStepD'].forEach((id,i) => {
+    document.getElementById(id).style.display = i===0 ? '' : 'none';
+  });
+  document.getElementById('upgradeModal').classList.remove('hidden');
+}
+function closeUpgradeModal() { document.getElementById('upgradeModal').classList.add('hidden'); }
+
+function selectPackage(id, el) {
+  selectedPackage = PACKAGES.find(p => p.id === id);
+  document.querySelectorAll('.pay-pkg').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function payGoMethod() {
+  if (!selectedPackage) { toast('Pilih paket dulu!', 'er'); return; }
+  document.getElementById('payStepA').style.display = 'none';
+  document.getElementById('payStepB').style.display = '';
+  document.querySelectorAll('.pay-opt').forEach(e => e.classList.remove('selected'));
+  selectedMethod = null;
+}
+function payGoPackage() {
+  document.getElementById('payStepB').style.display = 'none';
+  document.getElementById('payStepA').style.display = '';
+}
+
+function selectPayMethod(method, el) {
+  selectedMethod = method;
+  document.querySelectorAll('.pay-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function payGoDetail() {
+  if (!selectedMethod) { toast('Pilih metode pembayaran!', 'er'); return; }
+  uniqueCode = 100 + Math.floor(Math.random() * 900);
+  const price = isDemoUser() ? selectedPackage.demoPrice : selectedPackage.price;
+  const totalAmount = price + uniqueCode;
+  const info = PAYMENT_INFO[selectedMethod];
+  const methodLabels = { dana: '💙 DANA', gopay: '💚 GOPAY', qris: '📱 QRIS' };
+
+  document.getElementById('payDetailPkg').textContent = selectedPackage.name;
+  document.getElementById('payDetailAmt').textContent = 'Rp' + totalAmount.toLocaleString('id-ID');
+  document.getElementById('payDetailMethod').textContent = methodLabels[selectedMethod];
+  document.getElementById('payDetailName').textContent = 'a.n. ' + info.name;
+
+  // QRIS: show image, DANA/GoPay: show number
+  if (selectedMethod === 'qris') {
+    document.getElementById('payDetailNum').innerHTML = `
+      <img src="/qris.jpg" alt="QRIS AhmadBypass"
+        style="width:160px;height:160px;border:2px solid var(--border2);margin-bottom:8px;image-rendering:pixelated;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:1px;">${info.number}</div>`;
+  } else {
+    document.getElementById('payDetailNum').innerHTML =
+      `<div style="font-family:var(--mono);font-size:18px;color:var(--cyan);letter-spacing:3px;">${info.number}</div>`;
+  }
+
+  document.getElementById('payStepB').style.display = 'none';
+  document.getElementById('payStepC').style.display = '';
+}
+
+async function submitPayment() {
+  const senderName = document.getElementById('payProofName').value.trim();
+  if (!senderName) { toast('Masukkan nama pengirim!', 'er'); return; }
+  const user = currentDiscordUser;
+  const price = isDemoUser() ? selectedPackage.demoPrice : selectedPackage.price;
+  const total = price + uniqueCode;
+  const methodLabel = { dana: 'DANA', gopay: 'GoPay', qris: 'QRIS' }[selectedMethod] || selectedMethod;
+
+  // Send Discord webhook
+  const webhookBody = {
+    embeds: [{
+      title: '💰 PEMBAYARAN MASUK — AhmadBypass',
+      color: 0xffe600,
+      thumbnail: { url: user?.avatar || '' },
+      fields: [
+        { name: '👤 Discord',      value: `${user?.global_name || user?.username}\n\`${user?.id}\``, inline: true },
+        { name: '📦 Paket',        value: selectedPackage.name, inline: true },
+        { name: '💳 Metode',       value: methodLabel, inline: true },
+        { name: '💵 Nominal',      value: `**Rp${total.toLocaleString('id-ID')}**\n_(kode unik: ${uniqueCode})_`, inline: true },
+        { name: '🏷 Nama Pengirim', value: senderName, inline: true },
+        { name: '📅 Waktu',        value: new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) + ' WIB', inline: true },
+        { name: '⚙️ Aksi Admin',   value: `Tambahkan ID \`${user?.id}\` ke Firebase dengan tier \`${selectedPackage.id}\`` },
+      ],
+      footer: { text: 'AhmadBypass v2 · Saltoria Community · NMID: ID1024348725192' },
+    }]
+  };
+
+  try {
+    await fetch(DISCORD_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(webhookBody),
+    });
+    log('Notifikasi pembayaran terkirim ke Discord ✓', 'ok');
+  } catch (e) {
+    log('Webhook gagal (non-fatal): ' + e.message, 'warn');
+  }
+
+  document.getElementById('payStepC').style.display = 'none';
+  document.getElementById('payStepD').style.display = '';
+  toast('Konfirmasi pembayaran terkirim! ✅');
+}
+
+// ══════════════════════════════════════════════════════════
+// ── HISTORY ──
+// ══════════════════════════════════════════════════════════
+function getHistory()  { try{ return JSON.parse(localStorage.getItem('ab_history')||'[]'); }catch{ return []; } }
+function saveHistory(h){ try{ localStorage.setItem('ab_history', JSON.stringify(h)); }catch{} }
+function addHistory(entry){
+  const h = getHistory();
+  if(entry.id && h.find(x=>x.id===entry.id)){
+    const idx = h.findIndex(x=>x.id===entry.id);
+    h[idx] = {...h[idx], ...entry};
+  } else {
+    h.unshift({...entry, date: new Date().toLocaleDateString('id-ID')});
+    if(h.length>50) h.pop();
+  }
+  saveHistory(h);
+  renderHistory();
+}
+function renderHistory(){
+  const list = getHistory();
+  const el = document.getElementById('histList');
+  const empty = document.getElementById('histEmpty');
+  if(!list.length){ el.innerHTML=''; el.classList.add('hidden'); empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden'); el.classList.remove('hidden');
+  el.innerHTML = list.map(h=>`
+    <div class="hist-item">
+      <div class="hist-name">${h.name||'—'}</div>
+      <div class="hist-id">${h.assetId||'—'}</div>
+      ${h.target?`<div style="font-family:var(--mono);font-size:8px;color:var(--text3);margin-top:2px;">${h.target.startsWith('Group')?'🏰':'👤'} ${h.target}</div>`:''}
+      <button class="hist-copy" onclick="copyId('${(h.assetId||'').replace(/[^0-9]/g,'')}')">COPY ID</button>
+    </div>
+  `).join('');
+}
+function copyId(id){ if(!id) return; navigator.clipboard.writeText(id).then(()=>toast('Asset ID disalin!')); }
+function clearHistory(){ saveHistory([]); renderHistory(); toast('History dihapus'); }
+
+// ══════════════════════════════════════════════════════════
+// ── TABS / HELPERS / AUDIO ──
+// ══════════════════════════════════════════════════════════
+function switchTab(t){
+  ['upload','batch','history'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.toggle('active',x===t);
+    document.getElementById('pane-'+x).classList.toggle('hidden',x!==t);
+  });
+  if(t==='history') renderHistory();
+}
+function log(msg, type='info'){
+  const box = document.getElementById('logBox');
+  const ts = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  box.innerHTML += `<span class="ll-${type}">[${ts}] ${msg}</span><br>`;
+  box.scrollTop = box.scrollHeight;
+}
+function toast(msg, type='ok'){
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = (type==='ok'?'✓ ':'✗ ') + msg;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(), 3200);
+}
+function fmtSz(b){ return b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB'; }
+function fmtDur(s){ return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'); }
+function calcNormalSpeed(sp){ return Math.round((1/sp)*100)/100; }
+function updateSpeedRec(){
+  const ns = calcNormalSpeed(currentSpeed);
+  const su = document.getElementById('recSpeedUp');
+  const sn = document.getElementById('recNormalSpeed');
+  if(su) su.textContent = currentSpeed.toFixed(1)+'x';
+  if(sn) sn.textContent = ns.toFixed(2)+'x';
+  if(originalDuration > 0){
+    const newDur = originalDuration / currentSpeed;
+    const dw = document.getElementById('durationWarn');
+    if(dw){
+      if(originalDuration > 420){
+        const minSpeed = Math.ceil((originalDuration/420)*10)/10;
+        dw.innerHTML = `⚠ Durasi asli ${fmtDur(originalDuration)} — pada ${currentSpeed.toFixed(1)}x jadi ${fmtDur(newDur)}. Min speed: ${minSpeed.toFixed(1)}x`;
+        dw.classList.add('show');
+      } else { dw.classList.remove('show'); }
+    }
+  }
+}
+function onDrag(e){ e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function offDrag(e){ e.currentTarget.classList.remove('drag-over'); }
+function onDrop(e){ e.preventDefault(); offDrag(e); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); }
+
+async function handleFile(file){
+  if(!file) return;
+  const estimatedMp3 = file.size / 10;
+  const sizeWarn = document.getElementById('sizeWarn');
+  if(sizeWarn){
+    if(estimatedMp3 > 20*1024*1024){
+      sizeWarn.textContent = '⚠ Estimasi MP3 ~'+fmtSz(estimatedMp3)+' mungkin >20MB limit Roblox';
+      sizeWarn.classList.add('show');
+    } else { sizeWarn.classList.remove('show'); }
+  }
+  sourceFileName = file.name.replace(/\.[^.]+$/,'');
+  const nameEl = document.getElementById('audioName');
+  const metaEl = document.getElementById('audioMeta') || document.getElementById('audioSize');
+  if(nameEl) nameEl.textContent = file.name;
+  if(metaEl) metaEl.textContent = fmtSz(file.size)+' · '+file.type;
+  const objUrl = URL.createObjectURL(file);
+  const audioA = document.getElementById('audioA');
+  const audioB = document.getElementById('audioB');
+  if(audioA) audioA.src = objUrl;
+  if(audioB) audioB.src = '';
+  // Show loaded file box
+  const loaded = document.getElementById('audioLoaded');
+  if(loaded){ loaded.style.display='flex'; loaded.classList.add('show'); loaded.classList.remove('hidden'); }
+  const statusEl = document.getElementById('audioStatus');
+  if(statusEl){ statusEl.textContent='READY'; statusEl.className='loaded-badge badge-ready'; }
+  // Show process card, hide result/upload
+  const pc = document.getElementById('processCard');
+  const rs = document.getElementById('resultSection');
+  const rc = document.getElementById('robloxCard');
+  if(pc) pc.style.display = 'block';
+  if(rs){ rs.style.display='none'; rs.classList.add('hidden'); }
+  if(rc){ rc.style.display='none'; rc.classList.add('hidden'); }
+  processedBlob = null; processedBuffer = null;
+  log('File dimuat: '+file.name);
+  try{
+    audioCtx = new AudioContext();
+    audioBuffer = await audioCtx.decodeAudioData(await file.arrayBuffer());
+    originalDuration = audioBuffer.duration;
+    log('Durasi: '+fmtDur(originalDuration)+' · '+audioBuffer.sampleRate+'Hz','ok');
+    drawWaveform(audioBuffer);
+    const ww = document.getElementById('waveformWrap');
+    if(ww) ww.classList.add('show');
+    const an = document.getElementById('rblxAssetName');
+    if(an) an.value = sourceFileName;
+    updateSpeedRec();
+  }catch(e){ log('Decode error: '+e.message,'err'); toast('Gagal baca audio','er'); }
+}
+
+function drawWaveform(buf){
+  const c = document.getElementById('waveformCanvas');
+  const ctx = c.getContext('2d');
+  c.width = c.offsetWidth * devicePixelRatio;
+  c.height = c.offsetHeight * devicePixelRatio;
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  const W=c.offsetWidth, H=c.offsetHeight, data=buf.getChannelData(0);
+  const step=Math.ceil(data.length/W);
+  ctx.clearRect(0,0,W,H);
+  const grad = ctx.createLinearGradient(0,0,W,0);
+  grad.addColorStop(0,'#00ffc8'); grad.addColorStop(0.5,'#ff00aa'); grad.addColorStop(1,'#00ffc8');
+  ctx.strokeStyle=grad; ctx.lineWidth=1; ctx.beginPath();
+  for(let i=0;i<W;i++){
+    let mn=1,mx=-1;
+    for(let j=0;j<step;j++){const v=data[i*step+j]||0;if(v<mn)mn=v;if(v>mx)mx=v;}
+    ctx.moveTo(i,(1+mn)/2*H); ctx.lineTo(i,(1+mx)/2*H);
+  }
+  ctx.stroke();
+}
+
+function setSpeed(s){
+  currentSpeed = s;
+  document.querySelectorAll('.sp-btn').forEach(b=>b.classList.remove('active'));
+  const b = document.getElementById('sp'+s); if(b) b.classList.add('active');
+  document.getElementById('customSpeed').value = s;
+  document.getElementById('speedDisplay').textContent = s.toFixed(1)+'x';
+  updateSpeedRec();
+}
+function updateCustomSpeed(v){
+  currentSpeed = parseFloat(v);
+  document.getElementById('speedDisplay').textContent = parseFloat(v).toFixed(1)+'x';
+  document.querySelectorAll('.sp-btn').forEach(b=>b.classList.remove('active'));
+  [1.5,2.0,2.2,2.5,3.0].forEach(s=>{
+    if(Math.abs(s-currentSpeed)<0.05){ const b=document.getElementById('sp'+s); if(b) b.classList.add('active'); }
+  });
+  updateSpeedRec();
+}
+
+// ── YOUTUBE / SOUNDCLOUD URL FETCH ──
+// Pakai cobalt.tools API — gratis, no API key, support YT + SC
+async function fetchFromUrl(url) {
+  const urlInputBtn = document.getElementById('urlFetchBtn');
+  const urlStatus   = document.getElementById('urlStatus');
+  if (!url) { toast('Masukkan URL dulu!', 'er'); return; }
+  urlInputBtn.disabled = true;
+  urlInputBtn.innerHTML = '<span class="spinner"></span> FETCHING...';
+  urlStatus.textContent = '⏳ Mengambil audio dari URL...';
+  urlStatus.style.color = 'var(--yellow)';
+  try {
+    // cobalt.tools API v7
+    const cobaltRes = await fetch('https://api.cobalt.tools/v7/download', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        url: url.trim(),
+        downloadMode: 'audio',
+        audioFormat: 'mp3',
+        audioBitrate: '320',
+      }),
+    });
+    if (!cobaltRes.ok) throw new Error('Cobalt API error: ' + cobaltRes.status);
+    const cobaltData = await cobaltRes.json();
+
+    // cobalt returns { status, url } or { status, tunnel }
+    const audioUrl = cobaltData.url || cobaltData.tunnel;
+    if (!audioUrl) throw new Error('Tidak dapat URL audio: ' + JSON.stringify(cobaltData));
+
+    urlStatus.textContent = '⏳ Mengunduh audio...';
+    const audioRes = await fetch(audioUrl);
+    if (!audioRes.ok) throw new Error('Download audio gagal: ' + audioRes.status);
+
+    const arrayBuf = await audioRes.arrayBuffer();
+    const blob = new Blob([arrayBuf], { type: 'audio/mp3' });
+
+    // Extract title from URL for filename
+    let title = 'audio_from_url';
+    try {
+      if (url.includes('youtu')) {
+        const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+        if (match) title = 'yt_' + match[1];
+      } else if (url.includes('soundcloud')) {
+        title = 'sc_' + url.split('/').filter(Boolean).pop();
+      }
+    } catch (_) {}
+
+    const file = new File([blob], title + '.mp3', { type: 'audio/mp3' });
+    urlStatus.textContent = '✓ Audio berhasil diambil — memuat...';
+    urlStatus.style.color = 'var(--green)';
+    await handleFile(file);
+    toast('Audio dari URL berhasil dimuat! 🎵');
+    log('URL fetch sukses: ' + url, 'ok');
+  } catch (e) {
+    urlStatus.textContent = '✗ Gagal: ' + e.message;
+    urlStatus.style.color = 'var(--red)';
+    log('URL fetch error: ' + e.message, 'err');
+    toast('Gagal ambil audio dari URL', 'er');
+  }
+  urlInputBtn.disabled = false;
+  urlInputBtn.innerHTML = '⬇ FETCH AUDIO';
+}
+
+async function processAudio(){
+  if(!audioBuffer){ toast('Upload file dulu!','er'); return; }
+  const btn = document.getElementById('processBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Processing...';
+  const pw=document.getElementById('progressWrap'), pb=document.getElementById('progressBar');
+  if(pw) pw.classList.add('show'); if(pb) pb.style.width='0%';
+  const statusEl = document.getElementById('audioStatus');
+  if(statusEl){ statusEl.textContent='PROC'; statusEl.className='loaded-badge badge-proc'; }
+  log('Processing speed='+currentSpeed+'x');
+  await new Promise(r=>setTimeout(r,30));
+  if(pb) pb.style.width='20%';
+  try{
+    const {sampleRate,numberOfChannels,length}=audioBuffer;
+    const newLen = Math.ceil(length/currentSpeed);
+    const oCtx = new OfflineAudioContext(numberOfChannels,newLen,sampleRate);
+    if(pb) pb.style.width='40%';
+    const src = oCtx.createBufferSource();
+    src.buffer=audioBuffer; src.playbackRate.value=currentSpeed;
+    src.connect(oCtx.destination); src.start(0);
+    if(pb) pb.style.width='55%';
+    const rendered = await oCtx.startRendering();
+    processedBuffer = rendered;
+    if(pb) pb.style.width='78%';
+    processedBlob = bufToWav(rendered);
+    if(pb) pb.style.width='95%';
+    const url = URL.createObjectURL(processedBlob);
+    const audioB = document.getElementById('audioB');
+    if(audioB) audioB.src = url;
+    const ns = calcNormalSpeed(currentSpeed);
+    const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+    set('statSpeed', currentSpeed.toFixed(1)+'x');
+    set('statDurOld', fmtDur(originalDuration));
+    set('statDurNew', fmtDur(rendered.duration));
+    set('recSpeedUp', currentSpeed.toFixed(1)+'x');
+    set('recNormalSpeed', ns.toFixed(2)+'x');
+    if(pb) pb.style.width='100%';
+    // Show result + upload card
+    const rs = document.getElementById('resultSection');
+    const rc = document.getElementById('robloxCard');
+    if(rs){ rs.style.display='block'; rs.classList.remove('hidden'); }
+    if(rc){ rc.style.display='block'; rc.classList.remove('hidden'); }
+    updateUploadGate();
+    if(statusEl){ statusEl.textContent='DONE'; statusEl.className='loaded-badge badge-done'; }
+    log('Done! Normal speed: '+ns.toFixed(2)+'x','ok');
+    toast('Audio diproses! Normal speed: '+ns.toFixed(2)+'x');
+    setTimeout(()=>{ if(pw) pw.classList.remove('show'); },800);
+  }catch(e){
+    log('ERROR: '+e.message,'err'); toast('Gagal proses audio','er');
+    if(pw) pw.classList.remove('show');
+  }
+  btn.disabled=false; btn.innerHTML='⚡ Process Audio';
+}
+
+function bufToWav(buf){
+  const nC=buf.numberOfChannels, sr=buf.sampleRate, L=buf.length;
+  const pcm=new Float32Array(L*nC);
+  for(let c=0;c<nC;c++){const d=buf.getChannelData(c);for(let i=0;i<L;i++)pcm[i*nC+c]=d[i];}
+  const i16=new Int16Array(L*nC);
+  for(let i=0;i<pcm.length;i++){const s=Math.max(-1,Math.min(1,pcm[i]));i16[i]=s<0?s*0x8000:s*0x7FFF;}
+  const ab=new ArrayBuffer(44+i16.byteLength), v=new DataView(ab);
+  const ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  ws(0,'RIFF');v.setUint32(4,36+i16.byteLength,true);ws(8,'WAVE');ws(12,'fmt ');
+  v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,nC,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*nC*2,true);v.setUint16(32,nC*2,true);
+  v.setUint16(34,16,true);ws(36,'data');v.setUint32(40,i16.byteLength,true);
+  new Int16Array(ab,44).set(i16);
+  return new Blob([ab],{type:'audio/wav'});
+}
+
+async function encodeToMp3(buf){
+  const nC = Math.min(buf.numberOfChannels,2);
+  const sr = buf.sampleRate;
+  const mp3enc = new lamejs.Mp3Encoder(nC, sr, 320);
+  const blockSize = 1152;
+  const L = buf.getChannelData(0);
+  const R = nC>1 ? buf.getChannelData(1) : L;
+  const li16 = new Int16Array(L.length);
+  const ri16 = new Int16Array(R.length);
+  for(let i=0;i<L.length;i++){
+    li16[i]=Math.max(-32768,Math.min(32767,L[i]*32767));
+    ri16[i]=Math.max(-32768,Math.min(32767,R[i]*32767));
+  }
+  const chunks=[];
+  for(let i=0;i<li16.length;i+=blockSize){
+    const ls=li16.subarray(i,i+blockSize);
+    const rs=ri16.subarray(i,i+blockSize);
+    const d = nC>1 ? mp3enc.encodeBuffer(ls,rs) : mp3enc.encodeBuffer(ls);
+    if(d.length>0) chunks.push(new Int8Array(d));
+  }
+  const end=mp3enc.flush(); if(end.length>0) chunks.push(new Int8Array(end));
+  return new Blob(chunks,{type:'audio/mp3'});
+}
+
+async function downloadMp3(){
+  if(!processedBuffer){ toast('Proses audio dulu!','er'); return; }
+  const btn = document.getElementById('mp3Btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> ENCODING MP3...';
+  try{
+    await new Promise(r=>setTimeout(r,30));
+    const blob = await encodeToMp3(processedBuffer);
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=sourceFileName+'_'+currentSpeed.toFixed(1)+'x_bypass.mp3';
+    a.click();
+    log('MP3 export: '+fmtSz(blob.size),'ok');
+    toast('Download MP3 dimulai! ('+fmtSz(blob.size)+')');
+  }catch(e){ log('MP3 error: '+e.message,'err'); toast('Gagal export MP3','er'); }
+  btn.disabled=false; btn.innerHTML='⬇ DOWNLOAD MP3';
+}
+function downloadWav(){
+  if(!processedBlob) return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(processedBlob);
+  a.download=sourceFileName+'_'+currentSpeed.toFixed(1)+'x_bypass.wav';
+  a.click(); toast('Download WAV dimulai!');
+}
+
+// ── UPLOAD TARGET TOGGLE ──
+let uploadTarget = 'personal';
+function setUploadTarget(mode){
+  uploadTarget = mode;
+  const pBtn = document.getElementById('targetPersonalBtn');
+  const cBtn = document.getElementById('targetCommunityBtn');
+  const pFields = document.getElementById('targetPersonalFields');
+  const cFields = document.getElementById('targetCommunityFields');
+  if(mode==='personal'){
+    pBtn.style.background='rgba(0,255,200,0.08)'; pBtn.style.color='var(--cyan)';
+    cBtn.style.background='transparent'; cBtn.style.color='var(--text2)';
+    pFields.classList.remove('hidden'); cFields.classList.add('hidden');
+  } else {
+    cBtn.style.background='rgba(255,0,170,0.08)'; cBtn.style.color='var(--magenta)';
+    pBtn.style.background='transparent'; pBtn.style.color='var(--text2)';
+    pFields.classList.add('hidden'); cFields.classList.remove('hidden');
+  }
+}
+
+// ── ROBLOX UPLOAD ──
+async function uploadToRoblox(){
+  if(!processedBuffer){ toast('Proses audio dulu!','er'); return; }
+  if(!canDoUpload()) return;
+  const apiKey=document.getElementById('rblxApiKey').value.trim();
+  const userId = uploadTarget==='community'
+    ? document.getElementById('rblxUserIdComm').value.trim()
+    : document.getElementById('rblxUserId').value.trim();
+  const gid = uploadTarget==='community'
+    ? document.getElementById('rblxGroupId').value.trim() : '';
+  const name=document.getElementById('rblxAssetName').value.trim()||sourceFileName;
+  if(!apiKey||!userId){ toast('Masukkan API Key dan User ID!','er'); return; }
+  if(uploadTarget==='community'&&!gid){ toast('Masukkan Group ID!','er'); return; }
+  saveCredentials();
+  const btn=document.getElementById('rblxBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> ENCODING MP3...';
+  log('Encoding audio ke MP3...');
+  const rd=document.getElementById('rblxResult');
+  try{
+    const mp3Blob = await encodeToMp3(processedBuffer);
+    log('MP3 encoded: '+fmtSz(mp3Blob.size),'ok');
+    if(mp3Blob.size>4*1024*1024) log('WARNING: MP3 masih >4MB','warn');
+    btn.innerHTML='<span class="spinner"></span> UPLOADING...';
+    log('Mengirim ke Roblox API...');
+    const fd=new FormData();
+    fd.append('request', JSON.stringify({
+      displayName:name,
+      description:'Uploaded via AhmadBypass v2 · Saltoria Community',
+      assetType:'Audio',
+      creationContext:{creator: gid?{groupId:parseInt(gid)}:{userId:parseInt(userId)}}
+    }));
+    fd.append('fileContent', mp3Blob, name+'.mp3');
+    const res = await fetch(PROXY,{method:'POST',headers:{'x-roblox-api-key':apiKey},body:fd});
+    log('Roblox status: '+res.status);
+    const rawText = await res.text();
+    log('Response: '+(rawText.substring(0,80)||'(empty)'));
+    let data = {};
+    if(rawText&&rawText.trim()){ try{ data=JSON.parse(rawText); }catch{ data={message:rawText}; } }
+    if(res.ok||res.status===200){
+      const opId = data.operationId||data.path||'';
+      const cleanOpId = opId.replace('operations/','');
+      log('Upload OK! operationId: '+cleanOpId,'ok');
+      rd.classList.remove('hidden');
+      rd.innerHTML=`
+        <div style="background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.3);padding:14px;margin-bottom:10px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:2px;margin-bottom:8px;">✓ UPLOAD SUCCESSFUL</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text2);line-height:2;">
+            OPERATION ID: <span style="color:var(--cyan)">${cleanOpId||'—'}</span><br>
+            STATUS: <span id="opStatus" style="color:var(--yellow)">CHECKING...</span>
+          </div>
+          <div style="margin-top:10px;">
+            <a href="https://create.roblox.com/dashboard/creations?activeTab=Audio" target="_blank"
+              style="font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:2px;">→ ROBLOX CREATOR HUB / AUDIO</a>
+          </div>
+        </div>`;
+      toast('Upload Roblox berhasil! 🚀');
+      incrementUpload(currentDiscordUser?.id);
+      updateTierUI();
+      const histId = Date.now();
+      addHistory({id:histId, name, assetId:cleanOpId?'⏳ '+cleanOpId:'—', speed:currentSpeed.toFixed(1)+'x', target:uploadTarget==='community'?'Group '+gid:'Personal'});
+      if(cleanOpId) pollOperation(apiKey, cleanOpId, 0, histId);
+    } else {
+      const errMsg = data.message||data.errors?.[0]?.message||data.error||('HTTP '+res.status);
+      throw new Error(errMsg);
+    }
+  }catch(e){
+    log('Upload error: '+e.message,'err');
+    rd.classList.remove('hidden');
+    rd.innerHTML=`
+      <div style="background:rgba(255,51,102,0.07);border:1px solid rgba(255,51,102,0.3);padding:14px;font-family:var(--mono);font-size:10px;">
+        <div style="color:var(--red);margin-bottom:6px;">✗ UPLOAD FAILED</div>
+        <div style="color:var(--text3);word-break:break-all;">${e.message}</div>
+        <div style="color:var(--text2);margin-top:10px;line-height:1.8;">
+          Kemungkinan penyebab:<br>
+          · API key tidak valid / expired<br>
+          · Permission belum set ke <span style="color:var(--cyan)">asset:write</span><br>
+          · User ID salah (harus angka)<br>
+          · File terlalu besar (&gt;20MB)<br><br>
+          <a href="https://create.roblox.com/dashboard/credentials" target="_blank" style="color:var(--cyan)">→ Buat API key baru di sini</a>
+        </div>
+      </div>`;
+    toast('Upload gagal','er');
+  }
+  btn.disabled=false; btn.innerHTML='🚀 UPLOAD KE ROBLOX CREATOR HUB';
+}
+
+async function pollOperation(apiKey, opId, attempt=0, histId=null){
+  if(attempt>12) return;
+  await new Promise(r=>setTimeout(r, 3000));
+  try{
+    const res = await fetch(PROXY+'?op='+encodeURIComponent('operations/'+opId),{
+      method:'POST', headers:{'x-roblox-api-key':apiKey,'x-check-op':'1'},
+      body: JSON.stringify({operationId: opId})
+    });
+    const data = await res.json();
+    const done = data.done||false;
+    const statusEl = document.getElementById('opStatus');
+    if(!statusEl) return;
+    if(done){
+      const assetId = data.response?.assetId||data.response?.Id||'';
+      statusEl.textContent = 'DONE ✓' + (assetId?' · Asset ID: '+assetId:'');
+      statusEl.style.color='var(--green)';
+      log('Roblox processing done! Asset ID: '+assetId,'ok');
+      if(assetId && histId) addHistory({id:histId, assetId});
+      else if(assetId) addHistory({name:sourceFileName, assetId, speed:currentSpeed.toFixed(1)+'x'});
+    } else {
+      statusEl.textContent = 'PROCESSING... ('+((attempt+1)*3)+'s)';
+      pollOperation(apiKey, opId, attempt+1, histId);
+    }
+  }catch(e){ log('Poll error: '+e.message,'warn'); }
+}
+
+// ── BATCH ──
+function onBatchDrop(e){ e.preventDefault(); offDrag(e); addBatchFiles(e.dataTransfer.files); }
+function updateBatchSpeed(v){ batchSpeed=parseFloat(v); document.getElementById('batchSpeedDisp').textContent=parseFloat(v).toFixed(1)+'x'; }
+function addBatchFiles(files){
+  const cfg = TIER_CONFIG[currentTier];
+  const maxBatch = cfg.batchMax===-1 ? 999 : cfg.batchMax;
+  const toAdd = [...files].slice(0, maxBatch);
+  if(toAdd.length < files.length) toast(`Tier kamu max ${maxBatch} file. ${files.length-toAdd.length} diabaikan.`,'er');
+  toAdd.forEach(f=>{ batchQueue.push({file:f,status:'queue',blob:null}); });
+  renderBatch();
+  document.getElementById('batchControls').classList.remove('hidden');
+  document.getElementById('batchEmpty').classList.add('hidden');
+}
+function renderBatch(){
+  const el=document.getElementById('batchList');
+  if(!batchQueue.length){ el.classList.add('hidden'); document.getElementById('batchEmpty').classList.remove('hidden'); return; }
+  el.classList.remove('hidden');
+  el.innerHTML = batchQueue.map((item,i)=>`
+    <div class="batch-item" id="bi-${i}">
+      <div class="batch-name">${item.file.name}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${fmtSz(item.file.size)}</div>
+      <div class="batch-status bs-${item.status}" id="bs-${i}">${item.status.toUpperCase()}</div>
+      ${item.blob?`<button class="hist-copy" onclick="dlBatch(${i})">DL</button>`:''}
+    </div>
+  `).join('');
+}
+async function startBatch(){
+  if(!canDoBatch(batchQueue.length)) return;
+  const btn=document.getElementById('batchStartBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> PROCESSING...';
+  for(let i=0;i<batchQueue.length;i++){
+    if(batchQueue[i].status==='done') continue;
+    batchQueue[i].status='proc'; renderBatch();
+    try{
+      const ac=new AudioContext();
+      const ab=await ac.decodeAudioData(await batchQueue[i].file.arrayBuffer());
+      const nL=Math.ceil(ab.length/batchSpeed);
+      const oC=new OfflineAudioContext(ab.numberOfChannels,nL,ab.sampleRate);
+      const src=oC.createBufferSource(); src.buffer=ab; src.playbackRate.value=batchSpeed;
+      src.connect(oC.destination); src.start(0);
+      const rendered=await oC.startRendering();
+      batchQueue[i].blob=bufToWav(rendered);
+      batchQueue[i].status='done';
+    }catch(e){ batchQueue[i].status='err'; }
+    renderBatch();
+  }
+  btn.disabled=false; btn.innerHTML='⚡ PROCESS ALL';
+  toast('Batch selesai!');
+}
+function dlBatch(i){
+  const item=batchQueue[i]; if(!item.blob) return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(item.blob);
+  a.download=item.file.name.replace(/\.[^.]+$/,'')+'_'+batchSpeed.toFixed(1)+'x_bypass.wav';
+  a.click();
+}
+function clearBatch(){ batchQueue=[]; document.getElementById('batchControls').classList.add('hidden'); renderBatch(); }
+
+// ── MISC ──
+function resetAll(){
+  audioBuffer=null; processedBlob=null; processedBuffer=null;
+  const loaded = document.getElementById('audioLoaded');
+  const rs = document.getElementById('resultSection');
+  const rc = document.getElementById('robloxCard');
+  const pc = document.getElementById('processCard');
+  const ww = document.getElementById('waveformWrap');
+  const fi = document.getElementById('fileInput');
+  if(loaded){ loaded.style.display='none'; loaded.classList.remove('show'); }
+  if(rs){ rs.style.display='none'; rs.classList.add('hidden'); }
+  if(rc){ rc.style.display='none'; rc.classList.add('hidden'); }
+  if(pc) pc.style.display='none';
+  if(ww) ww.classList.remove('show');
+  if(fi) fi.value='';
+  const lb = document.getElementById('logBox');
+  if(lb) lb.innerHTML='<span class="ll-info">// RESET — READY</span><br>';
+  setSpeed(2.2);
+  toast('Reset OK');
+}
+function scrollToUpload(){ document.getElementById('robloxCard').scrollIntoView({behavior:'smooth'}); }
+
+// ── CREDENTIALS ──
+function saveCredentials(){
+  const user = currentDiscordUser;
+  if(!user) return;
+  const apiKey = document.getElementById('rblxApiKey').value.trim();
+  const userId = document.getElementById('rblxUserId').value.trim();
+  const userIdComm = document.getElementById('rblxUserIdComm').value.trim();
+  const groupId = document.getElementById('rblxGroupId').value.trim();
+  if(apiKey&&(userId||userIdComm)){
+    localStorage.setItem('ab_creds_'+user.id, JSON.stringify({apiKey, userId, userIdComm, groupId, uploadTarget}));
+    log('Credentials disimpan','ok');
+  }
+}
+function loadCredentials(id){
+  try{ return JSON.parse(localStorage.getItem('ab_creds_'+id)||'null'); }catch{ return null; }
+}
+
+// ══════════════════════════════════════════════════════════
+// ── INIT ──
+// ══════════════════════════════════════════════════════════
+
+// ── VIEW SWITCHING ──
+function switchView(v){
+  ['converter','batch','history'].forEach(x=>{
+    const el = document.getElementById('view-'+x);
+    const nav = document.getElementById('nav-'+x);
+    if(el) el.style.display = x===v ? 'block' : 'none';
+    if(nav) nav.classList.toggle('active', x===v);
+  });
+  if(v==='history') renderHistory();
+}
+
+// ── SOURCE TAB ──
+function switchSrcTab(t){
+  document.getElementById('srcPaneFile').style.display = t==='file' ? 'block' : 'none';
+  document.getElementById('srcPaneUrl').style.display  = t==='url'  ? 'block' : 'none';
+  document.getElementById('srcTabFile').classList.toggle('active', t==='file');
+  document.getElementById('srcTabUrl').classList.toggle('active',  t==='url');
+}
+
+// ── INIT ──
+(function init(){
+  // Restore Discord session jika ada
+  const saved = localStorage.getItem('ab_discord_user');
+  if(saved){
+    try{
+      currentDiscordUser = JSON.parse(saved);
+      enterApp();
+    } catch(e){}
+  } else {
+    updateTierUI();
+  }
+  // Handle pesan dari popup Discord
+  window.addEventListener('message', e => {
+    if(e.data?.type === 'DISCORD_ERROR') toast('Discord error: ' + e.data.error, 'er');
+  });
+})();
+</script>
+</body>
+</html>
